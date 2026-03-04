@@ -1,0 +1,8 @@
+{
+  "appId": "com.fabricpro.calculator",
+  "appName": "Fabric Pro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

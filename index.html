@@ -3,32 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Fabric Pro Calculator</title>
+    <title>Fabric Pro - Karna Bdr</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-          darkMode: 'media', 
-        }
+        tailwind.config = { darkMode: 'media' }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            padding-top: env(safe-area-inset-top);
             background-color: #f8fafc;
         }
-
         @media (prefers-color-scheme: dark) {
             body { background-color: #0f172a; }
         }
-
         .result-card {
             background: linear-gradient(135deg, #0d9488 0%, #065f46 100%);
+            position: sticky;
+            top: 0;
+            z-index: 50;
             border-radius: 0 0 2.5rem 2.5rem;
         }
-
         .form-input {
             width: 100%;
             padding: 1rem;
@@ -36,28 +32,19 @@
             outline: none;
             font-weight: 700;
             font-size: 1.1rem;
-            transition: all 0.2s;
             background-color: #ffffff;
             border: 2px solid #e2e8f0;
             color: #1e293b;
+            transition: all 0.2s;
         }
-
         @media (prefers-color-scheme: dark) {
             .form-input {
                 background-color: #1e293b;
                 border: 2px solid #334155;
                 color: #f1f5f9;
             }
-            .card-bg { background-color: #1e293b !important; border-color: #334155 !important; }
+            .form-input:focus { border-color: #2dd4bf; background-color: #0f172a; }
         }
-
-        .form-input:focus {
-            border-color: #0d9488;
-            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
-        }
-
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
@@ -68,85 +55,119 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <div class="flex-grow pb-10">
-        <!-- Result Section -->
-        <div class="result-card p-8 text-white text-center shadow-xl mb-6">
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Total Fabric Required</p>
-            <h2 class="text-6xl font-black tracking-tighter mb-4">
-                <span id="mtr-display">0.00</span><span class="text-2xl ml-1 font-bold opacity-60">Mtr</span>
-            </h2>
-            <div class="pt-4 border-t border-white/20">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">Total Estimated Cost</p>
-                <h3 class="text-4xl font-black text-yellow-400">
-                    <span class="text-xl mr-1">Rs.</span><span id="cost-display">0.00</span>
-                </h3>
+    <!-- Top Result Section (Sticky) -->
+    <div class="result-card p-8 text-white text-center shadow-xl mb-6">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Total Fabric Required</p>
+        <h2 class="text-6xl font-black tracking-tighter mb-4">
+            <span id="mtr-display">0.00</span><span class="text-2xl ml-1 font-bold opacity-60">Mtr</span>
+        </h2>
+        <div class="pt-4 border-t border-white/20">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">Total Estimated Cost</p>
+            <h3 class="text-4xl font-black text-yellow-400">
+                <span class="text-xl mr-1">Rs.</span><span id="cost-display">0.00</span>
+            </h3>
+        </div>
+    </div>
+
+    <!-- Inputs Area -->
+    <div class="max-w-md mx-auto px-5 space-y-5 flex-grow">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Length (CM)</label>
+                <input type="number" id="L" value="0" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='0';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('W').focus()" 
+                    class="form-input">
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Width (CM)</label>
+                <input type="number" id="W" value="0" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='0';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('hToggle').checked ? document.getElementById('H').focus() : document.getElementById('fW').focus()" 
+                    class="form-input">
             </div>
         </div>
 
-        <!-- Input Section -->
-        <div class="max-w-md mx-auto px-5 space-y-5">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Length (CM)</label>
-                    <input type="number" id="L" placeholder="0" oninput="calc()" class="form-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Width (CM)</label>
-                    <input type="number" id="W" placeholder="0" oninput="calc()" class="form-input">
-                </div>
-            </div>
+        <div class="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between shadow-sm">
+            <span class="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase">Include Height / Drop</span>
+            <label class="switch">
+                <input type="checkbox" id="hToggle" onchange="toggleH()">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-            <div class="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between shadow-sm card-bg">
-                <span class="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase">Include Height / Drop</span>
-                <label class="switch">
-                    <input type="checkbox" id="hToggle" onchange="toggleH()">
-                    <span class="slider"></span>
-                </label>
-            </div>
+        <div id="hBox" class="hidden">
+            <label class="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase ml-1">Height (CM)</label>
+            <input type="number" id="H" value="0" 
+                oninput="calc()" 
+                onfocus="this.value=''" 
+                onblur="if(this.value=='')this.value='0';calc()" 
+                onkeydown="if(event.key==='Enter')document.getElementById('fW').focus()" 
+                class="form-input border-teal-100 dark:border-teal-900 bg-teal-50/30">
+        </div>
 
-            <div id="hBox" class="hidden animate-fade-in">
-                <label class="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase ml-1">Height (CM)</label>
-                <input type="number" id="H" placeholder="0" oninput="calc()" class="form-input border-teal-100 dark:border-teal-900 bg-teal-50/30 dark:bg-teal-900/10">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Roll Width (CM)</label>
+                <input type="number" id="fW" value="150" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='150';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('qty').focus()" 
+                    class="form-input">
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Roll Width (CM)</label>
-                    <input type="number" id="fW" value="150" oninput="calc()" class="form-input text-base">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Quantity (Pcs)</label>
-                    <input type="number" id="qty" value="1" oninput="calc()" class="form-input text-base">
-                </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Quantity (Pcs)</label>
+                <input type="number" id="qty" value="1" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='1';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('rate').focus()" 
+                    class="form-input">
             </div>
+        </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Rate / Mtr</label>
-                    <input type="number" id="rate" placeholder="0" oninput="calc()" class="form-input text-base">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Wastage %</label>
-                    <input type="number" id="wst" value="10" oninput="calc()" class="form-input text-base">
-                </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Rate / Mtr</label>
+                <input type="number" id="rate" value="0" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='0';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('wst').focus()" 
+                    class="form-input">
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase ml-1">Wastage %</label>
+                <input type="number" id="wst" value="0" 
+                    oninput="calc()" 
+                    onfocus="this.value=''" 
+                    onblur="if(this.value=='')this.value='0';calc()" 
+                    onkeydown="if(event.key==='Enter')document.getElementById('L').focus()" 
+                    class="form-input">
             </div>
         </div>
     </div>
 
-    <!-- Footer with Developer Credit -->
-    <footer class="py-6 text-center">
-        <div class="inline-block px-4 py-1 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50 shadow-sm">
-            <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Developed by</p>
-            <p class="text-xs font-bold text-slate-800 dark:text-teal-400 uppercase tracking-tight">[Karna Bdr Bisunkhe]</p>
+    <!-- Developer Footer -->
+    <footer class="py-8 text-center mt-auto">
+        <div class="inline-block px-6 py-2 rounded-2xl bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 shadow-sm">
+            <p class="text-[9px] font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Developed by</p>
+            <p class="text-sm font-black text-teal-700 dark:text-teal-400 uppercase tracking-tight">KARNA BDR BISUNKHE</p>
         </div>
-        <p class="text-[9px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-widest mt-3">Fabric Pro v1.2</p>
+        <p class="text-[9px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-widest mt-4">Fabric Pro v1.5</p>
     </footer>
 
     <script>
         function toggleH() {
             const box = document.getElementById('hBox');
-            box.style.display = document.getElementById('hToggle').checked ? 'block' : 'none';
-            if(!document.getElementById('hToggle').checked) document.getElementById('H').value = "";
+            const isChecked = document.getElementById('hToggle').checked;
+            box.style.display = isChecked ? 'block' : 'none';
+            if(!isChecked) document.getElementById('H').value = "0";
             calc();
         }
 
@@ -169,8 +190,9 @@
             document.getElementById('mtr-display').innerText = totalMtr.toFixed(2);
             document.getElementById('cost-display').innerText = totalCost.toLocaleString(undefined, {minimumFractionDigits: 2});
         }
+
+        window.onload = calc;
     </script>
 </body>
 </html>
 
-  
